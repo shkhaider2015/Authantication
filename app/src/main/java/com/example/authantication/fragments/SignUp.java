@@ -21,6 +21,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.example.authantication.R;
 import com.example.authantication.Utilities.JsonApiHolder;
+import com.example.authantication.Utilities.UtilsSSL;
 import com.example.authantication.models.Register;
 
 import java.security.cert.CertificateException;
@@ -59,18 +60,19 @@ public class SignUp extends Fragment implements View.OnClickListener {
 
         init(view);
 
-//        // Create a new object from HttpLoggingInterceptor
-//        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//
-//        // Add Interceptor to HttpClient
-//        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        // Create a new object from HttpLoggingInterceptor
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        // Add Interceptor to HttpClient
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
 
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://10.0.2.2:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getUnsafeOkHttpClient().build())
+                .client(client)
                 .build();
 
         jsonApiHolder = retrofit.create(JsonApiHolder.class);
@@ -133,7 +135,7 @@ public class SignUp extends Fragment implements View.OnClickListener {
 //        fields.put("email", register.getEmail());
 //        fields.put("password", register.getPassword());
 
-        Call<Register> registerCall = jsonApiHolder.createUser(register.getName(), register.getEmail(), register.getPassword());
+        Call<Register> registerCall = jsonApiHolder.createUser(register);
 
         registerCall.enqueue(new Callback<Register>() {
             @Override
