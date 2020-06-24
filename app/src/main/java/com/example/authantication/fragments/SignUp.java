@@ -72,7 +72,7 @@ public class SignUp extends Fragment implements View.OnClickListener {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://10.0.2.2:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client)
+                .client(UtilsSSL.getUnsafeOkHttpClient())
                 .build();
 
         jsonApiHolder = retrofit.create(JsonApiHolder.class);
