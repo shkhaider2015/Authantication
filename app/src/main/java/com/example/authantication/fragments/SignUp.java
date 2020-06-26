@@ -36,6 +36,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -127,47 +128,72 @@ public class SignUp extends Fragment implements View.OnClickListener {
         createUser(register);
     }
 
-    private void createUser(Register register)
+    private void createUser(final Register register)
     {
-
-//        Map<String, String> fields = new HashMap<>();
-//        fields.put("name", register.getName());
-//        fields.put("email", register.getEmail());
-//        fields.put("password", register.getPassword());
 
         Call<Register> registerCall = jsonApiHolder.createUser(register);
 
-        registerCall.enqueue(new Callback<Register>() {
+        if (!isAvailable(register))
+        {
+            Toast.makeText(getContext(), "Email is Already Register", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+
+
+//        registerCall.enqueue(new Callback<Register>() {
+//            @Override
+//            public void onResponse(Call<Register> call, Response<Register> response) {
+//                if (!response.isSuccessful())
+//                {
+//                    Toast.makeText(getContext(), "Error Code : " + response.code() , Toast.LENGTH_SHORT).show();
+//                    Log.d(TAG, "onResponse: Code : " + response.code());
+//                    return;
+//                }
+//
+//                Toast.makeText(getContext(), "Account Created Successfuly", Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, " RESPONSE " + response.body());
+//
+//                Handler handler = new Handler();
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        loadFragment(new Login());
+//                    }
+//                }, 200);
+//
+//
+//            }
+//
+//            @Override
+//            public void onFailure(Call<Register> call, Throwable t) {
+//
+//                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+//                Log.d(TAG, "onFailure: " + t.getMessage());
+//            }
+//        });
+    }
+
+    private boolean isAvailable(Register user)
+    {
+        final boolean[] value = {false};
+        Call<Register> stringCall = jsonApiHolder.checkEmail(user.getEmail());
+
+        stringCall.enqueue(new Callback<Register>() {
             @Override
             public void onResponse(Call<Register> call, Response<Register> response) {
-                if (!response.isSuccessful())
-                {
-                    Toast.makeText(getContext(), "Error Code : " + response.code() , Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, "onResponse: Code : " + response.code());
-                    return;
-                }
-
-                Toast.makeText(getContext(), "Account Created Successfuly", Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onResponse: Account Created Successfuly");
-
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        loadFragment(new Login());
-                    }
-                }, 200);
-
 
             }
 
             @Override
             public void onFailure(Call<Register> call, Throwable t) {
 
-                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "onFailure: " + t.getMessage());
             }
         });
+
+
+        return value[0];
     }
     private void loadFragment(Fragment fragment) {
         // create a FragmentManager
