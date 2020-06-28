@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.example.authantication.Utilities.JsonApiHolder;
 import com.example.authantication.Utilities.UtilsSSL;
 import com.example.authantication.models.Register;
 
+import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +53,7 @@ public class SignUp extends Fragment implements View.OnClickListener {
     private EditText mName, mEmail, mPassword;
     private Button mSignUp;
     private TextView mToLogin;
+    private ProgressBar mProgress;
 
     private JsonApiHolder jsonApiHolder;
 
@@ -88,6 +91,7 @@ public class SignUp extends Fragment implements View.OnClickListener {
         mPassword = view.findViewById(R.id.signup_password);
         mSignUp = view.findViewById(R.id.signup_btn);
         mToLogin = view.findViewById(R.id.signup_to_login);
+        mProgress = view.findViewById(R.id.signup_progress);
 
         mToLogin.setOnClickListener(this);
         mSignUp.setOnClickListener(this);
@@ -128,69 +132,89 @@ public class SignUp extends Fragment implements View.OnClickListener {
         createUser(register);
     }
 
-    private void createUser(final Register register)
+    private void createUser(Register user)
     {
 
-        Call<Register> registerCall = jsonApiHolder.createUser(register);
+        setmProgress(true);
 
-        if (!isAvailable(register))
-        {
-            Toast.makeText(getContext(), "Email is Already Register", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-
-
-//        registerCall.enqueue(new Callback<Register>() {
-//            @Override
-//            public void onResponse(Call<Register> call, Response<Register> response) {
-//                if (!response.isSuccessful())
-//                {
-//                    Toast.makeText(getContext(), "Error Code : " + response.code() , Toast.LENGTH_SHORT).show();
-//                    Log.d(TAG, "onResponse: Code : " + response.code());
-//                    return;
-//                }
-//
-//                Toast.makeText(getContext(), "Account Created Successfuly", Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, " RESPONSE " + response.body());
-//
-//                Handler handler = new Handler();
-//                handler.postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        loadFragment(new Login());
-//                    }
-//                }, 200);
-//
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<Register> call, Throwable t) {
-//
-//                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "onFailure: " + t.getMessage());
-//            }
-//        });
-    }
-
-    private boolean isAvailable(Register user)
-    {
-        final boolean[] value = {false};
         Call<Register> stringCall = jsonApiHolder.checkEmail(user.getEmail());
+
+        final Call<Register> registerCall = jsonApiHolder.createUser(user);
 
         stringCall.enqueue(new Callback<Register>() {
             @Override
-            public void onResponse(Call<Register> call, Response<Register> response) {
+            public void onResponse(Call<Register> call, Response<Register> response)
+            {
+                if (!response.isSuccessful())
+                {
+                    Log.d(TAG, "onResponse: Response is not successful");
+                    setmProgress(false);
+                    return;
+                }
+
+                Register user = response.body();
+                Log.d(TAG, "onResponse: USER : " + user);
+                assert user != null;
+                if (user.getEmail() != null)
+                {
+                    setmProgress(false);
+                    Toast.makeText(getContext(), "Email is Already Register", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Create User
+                registerCall.enqueue(new Callback<Register>() {
+                    @Override
+                    public void onResponse(Call<Register> call, Response<Register> response) {
+                        if (!response.isSuccessful())
+                        {
+                            Toast.makeText(getContext(), "Error Code : " + response.code() , Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, "onResponse: Code : " + response.code());
+                            setmProgress(false);
+                            return;
+                        }
+
+                        Toast.makeText(getContext(), "Account Created Successfuly", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, " RESPONSE " + response.body());
+
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                setmProgress(false);
+                                loadFragment(new Login());
+                            }
+                        }, 200);
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<Register> call, Throwable t) {
+
+                        Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onFailure: " + t.getMessage());
+                        setmProgress(false);
+                    }
+                });
+
 
             }
 
             @Override
             public void onFailure(Call<Register> call, Throwable t) {
-
+                Toast.makeText(getContext(), "Check Your Network", Toast.LENGTH_SHORT).show();
+                setmProgress(false);
             }
         });
+
+
+
+
+    }
+
+    private boolean isAvailable(Register user){
+        final boolean[] value = {false};
 
 
         return value[0];
@@ -208,6 +232,13 @@ public class SignUp extends Fragment implements View.OnClickListener {
     }
 
 
+    private void setmProgress(boolean x)
+    {
+        if (x)
+            mProgress.setVisibility(View.VISIBLE);
+        else
+            mProgress.setVisibility(View.GONE);
+    }
 
     public static OkHttpClient.Builder getUnsafeOkHttpClient() {
         try {

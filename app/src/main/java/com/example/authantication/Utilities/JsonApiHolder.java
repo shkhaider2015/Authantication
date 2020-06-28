@@ -12,6 +12,7 @@ import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface JsonApiHolder {
@@ -20,9 +21,6 @@ public interface JsonApiHolder {
     @POST("createuser")
     Call<Register> createUser(@Body Register register);
 
-    @GET("checkemail")
-    Call<Register> checkUser(Register user);
-
-    @GET("checkemail")
-    Call<Register> checkEmail(@Query("email") String email);
+    @GET("checkemail/{email}")
+    Call<Register> checkEmail(@Path("email") String email);
 }
