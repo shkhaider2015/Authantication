@@ -5,17 +5,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.authantication.R;
+import com.example.authantication.Utilities.JsonApiHolder;
+import com.example.authantication.Utilities.UtilsSSL;
+import com.example.authantication.models.Register;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitHome extends AppCompatActivity implements View.OnClickListener {
 
     private Button btnGET, btnPOST, btnSEND_FILE;
+    private TextView mTextView;
+    private JsonApiHolder jsonApiHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_retrofit_home);
+        init();
+        accessIndex();
     }
 
     private void init()
@@ -23,6 +40,7 @@ public class RetrofitHome extends AppCompatActivity implements View.OnClickListe
         btnGET = findViewById(R.id.getdata);
         btnPOST = findViewById(R.id.postdata);
         btnSEND_FILE = findViewById(R.id.sendFile);
+        mTextView = findViewById(R.id.R_Home_textView);
 
         btnGET.setOnClickListener(this);
         btnPOST.setOnClickListener(this);
@@ -43,5 +61,43 @@ public class RetrofitHome extends AppCompatActivity implements View.OnClickListe
                 //
                 break;
         }
+    }
+
+    private void accessIndex()
+    {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        // Add Interceptor to HttpClient
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://10.0.2.2:5000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(UtilsSSL.getUnsafeOkHttpClient())
+                .build();
+
+        jsonApiHolder = retrofit.create(JsonApiHolder.class);
+
+        Call<String> call = jsonApiHolder.index();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (!response.isSuccessful())
+                {
+                    Toast.makeText(getApplicationContext(), "Code : " + response.code(), Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String content = response.body();
+                mTextView.setText(content);
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 }

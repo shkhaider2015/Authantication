@@ -23,4 +23,13 @@ public interface JsonApiHolder {
 
     @GET("checkemail/{email}")
     Call<Register> checkEmail(@Path("email") String email);
+
+    @GET("login/{email}+{password}")
+    Call<Register> login(
+            @Path("email") String email,
+            @Path("password") String Password
+                         );
+
+    @GET("index")
+    Call<String> index();
 }
