@@ -8,13 +8,13 @@ import com.example.authantication.R;
 
 public class SessionManager {
 
-    private Context mCTX;
+//    private Context mCTX;
+//
+//    public SessionManager(Context mCTX) {
+//        this.mCTX = mCTX;
+//    }
 
-    public SessionManager(Context mCTX) {
-        this.mCTX = mCTX;
-    }
-
-    public void setUserToken(String token)
+    public static void setUserToken(String token, Context mCTX)
     {
         SharedPreferences sharedPreferences;
         sharedPreferences = mCTX.getSharedPreferences(mCTX.getString(R.string.app_name), mCTX.MODE_PRIVATE);
@@ -24,7 +24,7 @@ public class SessionManager {
         editor.commit();
     }
 
-    public String getUserToken()
+    public static String getUserToken(Context mCTX)
     {
         SharedPreferences sharedPreferences;
         sharedPreferences = mCTX.getSharedPreferences(mCTX.getString(R.string.app_name), mCTX.MODE_PRIVATE);

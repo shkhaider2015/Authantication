@@ -5,20 +5,21 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetSngleTon {
 
-    private static Retrofit retrofit = null;
+    private static JsonApiHolder jsonApiHolder = null;
 
-    public static Retrofit getInstance()
+    public static JsonApiHolder getInstance()
     {
-        if (retrofit != null)
-            return retrofit;
+        if (jsonApiHolder != null)
+            return jsonApiHolder;
 
-        retrofit = new Retrofit.Builder()
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://10.0.2.2:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(UtilsSSL.getUnsafeOkHttpClient())
                 .build();
 
-        return retrofit;
+        jsonApiHolder = retrofit.create(JsonApiHolder.class);
+        return jsonApiHolder;
     }
 
 }

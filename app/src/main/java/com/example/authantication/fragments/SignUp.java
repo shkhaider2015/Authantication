@@ -75,9 +75,7 @@ public class SignUp extends Fragment implements View.OnClickListener {
 
 
 
-        Retrofit retrofit = RetSngleTon.getInstance();
-
-        jsonApiHolder = retrofit.create(JsonApiHolder.class);
+        jsonApiHolder = RetSngleTon.getInstance();
 
         return view;
     }

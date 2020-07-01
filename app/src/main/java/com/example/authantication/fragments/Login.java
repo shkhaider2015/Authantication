@@ -23,6 +23,7 @@ import com.example.authantication.R;
 import com.example.authantication.Utilities.BasicAuthInterceptor;
 import com.example.authantication.Utilities.JsonApiHolder;
 import com.example.authantication.Utilities.RetSngleTon;
+import com.example.authantication.Utilities.SessionManager;
 import com.example.authantication.Utilities.UtilsSSL;
 import com.example.authantication.models.Register;
 
@@ -59,9 +60,9 @@ public class Login extends Fragment implements View.OnClickListener {
         // Add Interceptor to HttpClient
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-        Retrofit retrofit = RetSngleTon.getInstance();
 
-        jsonApiHolder = retrofit.create(JsonApiHolder.class);
+
+        jsonApiHolder = RetSngleTon.getInstance();
 
         return view;
     }
@@ -137,6 +138,7 @@ public class Login extends Fragment implements View.OnClickListener {
                 }
 
                 Toast.makeText(getContext(), "Successfully Logged In", Toast.LENGTH_SHORT).show();
+
                 startActivity(new Intent(getActivity(), RetrofitHome.class));
                 Objects.requireNonNull(getActivity()).finish();
             }

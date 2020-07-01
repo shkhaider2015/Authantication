@@ -72,9 +72,7 @@ public class RetrofitHome extends AppCompatActivity implements View.OnClickListe
         // Add Interceptor to HttpClient
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-        Retrofit retrofit = RetSngleTon.getInstance();
-
-        jsonApiHolder = retrofit.create(JsonApiHolder.class);
+        jsonApiHolder = RetSngleTon.getInstance();
 
         Call<String> call = jsonApiHolder.index();
         call.enqueue(new Callback<String>() {
