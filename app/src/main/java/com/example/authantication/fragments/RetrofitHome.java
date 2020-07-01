@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import com.example.authantication.R;
 import com.example.authantication.Utilities.JsonApiHolder;
+import com.example.authantication.Utilities.RetSngleTon;
 import com.example.authantication.Utilities.UtilsSSL;
 import com.example.authantication.models.Register;
 
@@ -71,11 +72,7 @@ public class RetrofitHome extends AppCompatActivity implements View.OnClickListe
         // Add Interceptor to HttpClient
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://10.0.2.2:5000/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(UtilsSSL.getUnsafeOkHttpClient())
-                .build();
+        Retrofit retrofit = RetSngleTon.getInstance();
 
         jsonApiHolder = retrofit.create(JsonApiHolder.class);
 
